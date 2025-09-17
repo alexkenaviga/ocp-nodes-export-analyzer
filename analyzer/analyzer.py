@@ -1,6 +1,9 @@
 import click
 from pathlib import Path
 
+from analyzer import Parser
+
+
 def common_options(f):
     """
     Decorate the command with common args and options
@@ -34,6 +37,8 @@ def analyze(folder):
 
         export_paths = [item for item in target_directory.iterdir() if item.is_file() and item.suffix == '.txt']
 
+        parser = Parser()
         for export_path in export_paths:
             print(f" - {export_path}")
 
+            parser.parse(export_path)

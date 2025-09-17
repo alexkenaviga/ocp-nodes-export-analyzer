@@ -1,0 +1,107 @@
+Name:               prsilocp01-xzg76-infra-fs77h
+Roles:              infra,worker
+Labels:             beta.kubernetes.io/arch=amd64
+                    beta.kubernetes.io/os=linux
+                    kubernetes.io/arch=amd64
+                    kubernetes.io/hostname=prsilocp01-xzg76-infra-fs77h
+                    kubernetes.io/os=linux
+                    node-role.kubernetes.io/infra=
+                    node-role.kubernetes.io/worker=
+                    node.openshift.io/os_id=rhcos
+Annotations:        alpha.kubernetes.io/provided-node-ip: 10.10.13.158
+                    csi.volume.kubernetes.io/nodeid: {"csi.vsphere.vmware.com":"4223f1f3-655f-e2eb-5d1b-353d2bb6fb11"}
+                    machine.openshift.io/machine: openshift-machine-api/prsilocp01-xzg76-infra-fs77h
+                    machineconfiguration.openshift.io/controlPlaneTopology: HighlyAvailable
+                    machineconfiguration.openshift.io/currentConfig: rendered-worker-704bcd8c1db9f4d88765d5a398b12fbf
+                    machineconfiguration.openshift.io/desiredConfig: rendered-worker-704bcd8c1db9f4d88765d5a398b12fbf
+                    machineconfiguration.openshift.io/desiredDrain: uncordon-rendered-worker-704bcd8c1db9f4d88765d5a398b12fbf
+                    machineconfiguration.openshift.io/lastAppliedDrain: uncordon-rendered-worker-704bcd8c1db9f4d88765d5a398b12fbf
+                    machineconfiguration.openshift.io/lastObservedServerCAAnnotation: false
+                    machineconfiguration.openshift.io/lastSyncedControllerConfigResourceVersion: 1413635033
+                    machineconfiguration.openshift.io/post-config-action: 
+                    machineconfiguration.openshift.io/reason: 
+                    machineconfiguration.openshift.io/state: Done
+                    volumes.kubernetes.io/controller-managed-attach-detach: true
+CreationTimestamp:  Wed, 19 Apr 2023 14:33:00 +0200
+Taints:             node-role.kubernetes.io/infra:NoSchedule
+Unschedulable:      false
+Lease:
+  HolderIdentity:  prsilocp01-xzg76-infra-fs77h
+  AcquireTime:     <unset>
+  RenewTime:       Mon, 04 Aug 2025 10:14:29 +0200
+Conditions:
+  Type             Status  LastHeartbeatTime                 LastTransitionTime                Reason                       Message
+  ----             ------  -----------------                 ------------------                ------                       -------
+  MemoryPressure   False   Mon, 04 Aug 2025 10:12:56 +0200   Tue, 25 Mar 2025 12:07:28 +0100   KubeletHasSufficientMemory   kubelet has sufficient memory available
+  DiskPressure     False   Mon, 04 Aug 2025 10:12:56 +0200   Tue, 25 Mar 2025 12:07:28 +0100   KubeletHasNoDiskPressure     kubelet has no disk pressure
+  PIDPressure      False   Mon, 04 Aug 2025 10:12:56 +0200   Tue, 25 Mar 2025 12:07:28 +0100   KubeletHasSufficientPID      kubelet has sufficient PID available
+  Ready            True    Mon, 04 Aug 2025 10:12:56 +0200   Thu, 05 Jun 2025 21:15:50 +0200   KubeletReady                 kubelet is posting ready status
+Addresses:
+  ExternalIP:  10.10.13.158
+  InternalIP:  10.10.13.158
+  Hostname:    prsilocp01-xzg76-infra-fs77h
+Capacity:
+  cpu:                16
+  ephemeral-storage:  125293548Ki
+  hugepages-2Mi:      0
+  memory:             32712288Ki
+  pods:               250
+Allocatable:
+  cpu:                15500m
+  ephemeral-storage:  114396791822
+  hugepages-2Mi:      0
+  memory:             31561312Ki
+  pods:               250
+System Info:
+  Machine ID:                             76a34600e4ff43d79b5a64a4d199e927
+  System UUID:                            f3f12342-5f65-ebe2-5d1b-353d2bb6fb11
+  Boot ID:                                0cb7e4f3-fa8d-4a9a-aa25-0deaf86cdf31
+  Kernel Version:                         5.14.0-427.37.1.el9_4.x86_64
+  OS Image:                               Red Hat Enterprise Linux CoreOS 416.94.202410020522-0
+  Operating System:                       linux
+  Architecture:                           amd64
+  Container Runtime Version:              cri-o://1.29.9-2.rhaos4.16.git933bdd2.el9
+  Kubelet Version:                        v1.29.8+632b078
+  Kube-Proxy Version:                     v1.29.8+632b078
+ProviderID:                               vsphere://4223f1f3-655f-e2eb-5d1b-353d2bb6fb11
+Non-terminated Pods:                      (29 in total)
+  Namespace                               Name                                                     CPU Requests  CPU Limits  Memory Requests  Memory Limits  Age
+  ---------                               ----                                                     ------------  ----------  ---------------  -------------  ---
+  open-cluster-management-agent-addon     cluster-proxy-proxy-agent-76c9d66f86-s6jb6               0 (0%)        0 (0%)      0 (0%)           0 (0%)         89d
+  open-cluster-management-agent-addon     klusterlet-addon-workmgr-744c9449db-smdzx                0 (0%)        0 (0%)      128Mi (0%)       512Mi (1%)     89d
+  open-cluster-management-agent           klusterlet-6fc6b7866d-bpkxk                              50m (0%)      0 (0%)      64Mi (0%)        2Gi (6%)       89d
+  open-cluster-management-agent           klusterlet-agent-6d7dff945b-c7qtm                        2m (0%)       0 (0%)      16Mi (0%)        0 (0%)         89d
+  openshift-cluster-csi-drivers           vmware-vsphere-csi-driver-node-dgjvx                     30m (0%)      0 (0%)      150Mi (0%)       0 (0%)         59d
+  openshift-cluster-node-tuning-operator  tuned-8vvbp                                              10m (0%)      0 (0%)      50Mi (0%)        0 (0%)         261d
+  openshift-dns                           node-resolver-27cvf                                      5m (0%)       0 (0%)      21Mi (0%)        0 (0%)         177d
+  openshift-image-registry                node-ca-hg5jq                                            10m (0%)      0 (0%)      10Mi (0%)        0 (0%)         261d
+  openshift-ingress-canary                ingress-canary-hfjfs                                     10m (0%)      0 (0%)      20Mi (0%)        0 (0%)         261d
+  openshift-ingress                       router-default-69cfbc45cf-cjdqq                          100m (0%)     0 (0%)      256Mi (0%)       0 (0%)         261d
+  openshift-machine-config-operator       kube-rbac-proxy-crio-prsilocp01-xzg76-infra-fs77h        20m (0%)      0 (0%)      50Mi (0%)        0 (0%)         261d
+  openshift-machine-config-operator       machine-config-daemon-w9x88                              40m (0%)      0 (0%)      100Mi (0%)       0 (0%)         261d
+  openshift-monitoring                    alertmanager-main-1                                      9m (0%)       0 (0%)      120Mi (0%)       0 (0%)         261d
+  openshift-monitoring                    kube-state-metrics-56879b5596-xnn69                      4m (0%)       0 (0%)      110Mi (0%)       0 (0%)         261d
+  openshift-monitoring                    metrics-server-769974645d-tcsvj                          1m (0%)       0 (0%)      40Mi (0%)        0 (0%)         12h
+  openshift-monitoring                    monitoring-plugin-67b8fbfcb8-d9dml                       10m (0%)      0 (0%)      50Mi (0%)        0 (0%)         47d
+  openshift-monitoring                    node-exporter-kv8ch                                      9m (0%)       0 (0%)      47Mi (0%)        0 (0%)         261d
+  openshift-monitoring                    openshift-state-metrics-78b68c8b44-ztlqd                 3m (0%)       0 (0%)      72Mi (0%)        0 (0%)         261d
+  openshift-monitoring                    prometheus-operator-6d6d7f8f8f-cwcwr                     6m (0%)       0 (0%)      165Mi (0%)       0 (0%)         261d
+  openshift-monitoring                    prometheus-operator-admission-webhook-b9ddbfb4c-9jfjq    5m (0%)       0 (0%)      30Mi (0%)        0 (0%)         261d
+  openshift-monitoring                    telemeter-client-d6dbfdbf8-x7926                         3m (0%)       0 (0%)      70Mi (0%)        0 (0%)         59d
+  openshift-monitoring                    thanos-querier-5f4d69dc89-ngrcx                          15m (0%)      0 (0%)      87Mi (0%)        0 (0%)         253d
+  openshift-multus                        multus-5w8pr                                             10m (0%)      0 (0%)      65Mi (0%)        0 (0%)         261d
+  openshift-multus                        multus-additional-cni-plugins-mvvgd                      10m (0%)      0 (0%)      10Mi (0%)        0 (0%)         261d
+  openshift-multus                        network-metrics-daemon-lsrpg                             20m (0%)      0 (0%)      120Mi (0%)       0 (0%)         261d
+  openshift-network-diagnostics           network-check-target-9nqfw                               10m (0%)      0 (0%)      15Mi (0%)        0 (0%)         261d
+  openshift-sdn                           sdn-pk8b9                                                110m (0%)     0 (0%)      220Mi (0%)       0 (0%)         261d
+  openshift-vsphere-infra                 coredns-prsilocp01-xzg76-infra-fs77h                     200m (1%)     0 (0%)      400Mi (1%)       0 (0%)         261d
+  openshift-vsphere-infra                 keepalived-prsilocp01-xzg76-infra-fs77h                  200m (1%)     0 (0%)      400Mi (1%)       0 (0%)         261d
+Allocated resources:
+  (Total limits may be over 100 percent, i.e., overcommitted.)
+  Resource           Requests     Limits
+  --------           --------     ------
+  cpu                902m (5%)    0 (0%)
+  memory             2886Mi (9%)  2560Mi (8%)
+  ephemeral-storage  0 (0%)       0 (0%)
+  hugepages-2Mi      0 (0%)       0 (0%)
+Events:              <none>

@@ -1,6 +1,6 @@
 .idea/
 .DS_Store
-resources/
+temp/
 .venv/
 .env/
 __pycache__/
