@@ -13,7 +13,7 @@ class ContentParser:
         raise NotImplementedError()
 
 class AllocatedResourcesParser(ContentParser):
-    __RES_RE__ = re.compile(r"^(cpu|memory)( +)(\d+[A-Za-z]*)( +)(\(.+?\))( +)(\d+[A-Za-z]*)( +)")
+    __RES_RE__ = re.compile(r"^(cpu|memory)")
 
     def __init__(self):
         super().__init__("Allocated resources")
@@ -23,12 +23,12 @@ class AllocatedResourcesParser(ContentParser):
         for line in content:
             match = self.__RES_RE__.match(line)
             if match is not None:
-                out[match.group(1)] = (match.group(3), match.group(7))
+                tokens = line.split()
+                out[tokens[0]] = {"Requests": tokens[1], "Limits": tokens[3]}
         return out
 
 class NonTerminatedPodsParser(ContentParser):
     __SKIP_RE__ = re.compile(r"^(Namespace|-+)")
-    __POD_RE__ = re.compile(r"^(.+?)( +)(.+?)( +)")
 
     def __init__(self):
         super().__init__("Non-terminated Pods")
@@ -37,13 +37,12 @@ class NonTerminatedPodsParser(ContentParser):
         out = {}
         for line in content:
             if not self.__SKIP_RE__.match(line):
-                match = self.__POD_RE__.match(line)
-                if match is not None:
-                    namespace = match.group(1).strip()
-                    pod = re.sub(r"-[^-]*$", "", match.group(3).strip())
-                    if not out.get(namespace):
-                        out[namespace] = []
-                    out[namespace].append(pod)
+                tokens = line.split()
+                namespace = tokens[0]
+                pod = re.sub(r"-[^-]*$", "", tokens[1])
+                if not out.get(namespace):
+                    out[namespace] = {}
+                out[namespace][pod] = {"CPU Requests": tokens[2], "CPU Limits": tokens[4], "Memory Requests": tokens[6], "Memory Limits": tokens[8]}
         return out
 
 class Parser:
@@ -71,7 +70,7 @@ class Parser:
                     current_item = match.group(1)
 
                     value = match.group(2).strip()
-                    if len(value) == 0:
+                    if len(value) == 0 or value == "<none>":
                         value = None
 
                     parsed[current_item] = {
@@ -96,9 +95,11 @@ class Parser:
                         out[topic]["content"] = data["content"]
                     if data["value"] is not None:
                         out[topic]["value"] = data["value"]
-            print(json.dumps(out, indent=2))
+
+            return out
 
 
 if __name__ == "__main__":
     p = Parser()
-    p.parse(Path("../test/resources/test-report.txt"))
+    parsed = p.parse(Path("../test/resources/test-report.txt"))
+    print(json.dumps(parsed, indent=2))
