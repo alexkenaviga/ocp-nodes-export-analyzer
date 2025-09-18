@@ -54,7 +54,7 @@ def analyze(folder, include_openshift_ns, json_format):
         export_paths = [item for item in target_directory.iterdir() if item.is_file() and item.suffix == '.txt']
 
         parser = Parser()
-        pods = {}
+        output_data = {}
         resources = {}
 
         for export_path in export_paths:
@@ -62,23 +62,31 @@ def analyze(folder, include_openshift_ns, json_format):
 
             parsed = parser.parse(export_path)
 
-            for namespace in parsed["Non-terminated Pods"]["content"]:
+            non_terminated_pods = parsed["Non-terminated Pods"]["content"]
+            for namespace in non_terminated_pods:
+                # Include only non-openshift namespace unless flag `include_openshift_ns` requires them
                 if include_openshift_ns or not namespace.startswith("openshift"):
+
                     # print(f"    - {export_path} -> {namespace}")
-                    if namespace not in pods:
-                        pods[namespace] = {}
-                    for pod in parsed["Non-terminated Pods"]["content"][namespace]:
-                        if pod not in pods[namespace]:
-                            pods[namespace][pod] = 1
+                    if namespace not in output_data:
+                        output_data[namespace] = {}
+
+                    for pod_name in non_terminated_pods[namespace]:
+                        if pod_name not in output_data[namespace]:
+                            output_data[namespace][pod_name] = {"count": 1, "resources": []}
                         else :
-                            pods[namespace][pod] += 1
+                            output_data[namespace][pod_name]["count"] += 1
+
+                        if non_terminated_pods[namespace][pod_name] not in output_data[namespace][pod_name]["resources"]:
+                            output_data[namespace][pod_name]["resources"].append(non_terminated_pods[namespace][pod_name])
 
         if not json_format:
-            print("NAMESPACE\tDEPLOYMENT\tINSTANCES")
-            for namespace, pods in pods.items():
-                for pod in pods:
-                    print(f"{namespace}\t{pod}\t{pods[pod]}")
+            print("NAMESPACE\tDEPLOYMENT\tINSTANCES\tCPU REQUESTS\tCPU LIMITS\tMEMORY REQUESTS\tMEMORY LIMITS\tMULTIPLE RESOURCES")
+            for namespace, output_data in output_data.items():
+                for pod in output_data:
+                    resources = [value for value in output_data[pod]["resources"][0].values()]
+                    print(f"{namespace}\t{pod}\t{output_data[pod]["count"]}\t{'\t'.join(resources)}\t{len(output_data[pod]["resources"])>1}")
         else:
-            print(json.dumps(pods, indent=4))
+            print(json.dumps(output_data, indent=4))
 
 
