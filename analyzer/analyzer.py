@@ -5,6 +5,10 @@ from pathlib import Path
 from analyzer import Parser
 
 
+ANALYSIS_HEADER = ["NAMESPACE","DEPLOYMENT","INSTANCES","CPU REQUESTS[m]","CPU LIMITS[m]",
+                   "MEMORY REQUESTS","MEMORY LIMITS","MULTIPLE RESOURCES"]
+
+
 def common_options(f):
     """
     Decorate the command with common args and options
@@ -55,7 +59,6 @@ def analyze(folder, include_openshift_ns, json_format):
 
         parser = Parser()
         output_data = {}
-        resources = {}
 
         for export_path in export_paths:
             # print(f" - {export_path}")
@@ -81,10 +84,10 @@ def analyze(folder, include_openshift_ns, json_format):
                             output_data[namespace][pod_name]["resources"].append(non_terminated_pods[namespace][pod_name])
 
         if not json_format:
-            print("NAMESPACE\tDEPLOYMENT\tINSTANCES\tCPU REQUESTS\tCPU LIMITS\tMEMORY REQUESTS\tMEMORY LIMITS\tMULTIPLE RESOURCES")
+            print('\t'.join(ANALYSIS_HEADER))
             for namespace, output_data in output_data.items():
                 for pod in output_data:
-                    resources = [value for value in output_data[pod]["resources"][0].values()]
+                    resources = [str(value) for value in output_data[pod]["resources"][0].values()]
                     print(f"{namespace}\t{pod}\t{output_data[pod]["count"]}\t{'\t'.join(resources)}\t{len(output_data[pod]["resources"])>1}")
         else:
             print(json.dumps(output_data, indent=4))

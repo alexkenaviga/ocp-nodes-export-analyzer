@@ -33,6 +33,27 @@ class NonTerminatedPodsParser(ContentParser):
     def __init__(self):
         super().__init__("Non-terminated Pods")
 
+
+    @staticmethod
+    def parse_cpu(cpu_value: str):
+        if cpu_value is None:
+            return None
+        if cpu_value.endswith("m"):
+            return int(cpu_value[:-1])
+        return int(cpu_value) * 1000
+
+
+    @staticmethod
+    def parse_mem(mem_value: str):
+        if mem_value is None:
+            return None
+        if mem_value.endswith("G"):
+            return f"{int(mem_value[:-1]) * 1000}M"
+        if mem_value.endswith("Gi"):
+            return f"{int(mem_value[:-2]) * 1024}Mi"
+        return mem_value
+
+
     def parse(self, content: ArrayType):
         out = {}
         for line in content:
@@ -42,7 +63,19 @@ class NonTerminatedPodsParser(ContentParser):
                 pod = re.sub(r"-[^-]*$", "", tokens[1])
                 if not out.get(namespace):
                     out[namespace] = {}
-                out[namespace][pod] = {"CPU Requests": tokens[2], "CPU Limits": tokens[4], "Memory Requests": tokens[6], "Memory Limits": tokens[8]}
+
+                cpu_requests = self.parse_cpu(tokens[2])
+                cpu_limits = self.parse_cpu(tokens[4])
+                memory_requests = self.parse_mem(tokens[6])
+                memory_limits = self.parse_mem(tokens[8])
+
+                out[namespace][pod] = {
+                    "CPU Requests": cpu_requests,
+                    "CPU Limits": cpu_limits,
+                    "Memory Requests": memory_requests,
+                    "Memory Limits": memory_limits
+                }
+
         return out
 
 class Parser:
