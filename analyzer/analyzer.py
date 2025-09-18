@@ -35,7 +35,15 @@ def cli():
 
 @cli.command(name="analyze", help="Get a list of datasources")
 @common_options
-def analyze(folder, include_openshift_ns):
+@click.option(
+    "-j",
+    "--json-format",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Use JSON format, default is TSV"
+)
+def analyze(folder, include_openshift_ns, json_format):
     target_directory = Path(folder)
 
     if not  target_directory.is_dir():
@@ -65,9 +73,12 @@ def analyze(folder, include_openshift_ns):
                         else :
                             pods[namespace][pod] += 1
 
-        print("NAMESPACE\tDEPLOYMENT\tINSTANCES")
-        for namespace, pods in pods.items():
-            for pod in pods:
-                print(f"{namespace}\t{pod}\t{pods[pod]}")
+        if not json_format:
+            print("NAMESPACE\tDEPLOYMENT\tINSTANCES")
+            for namespace, pods in pods.items():
+                for pod in pods:
+                    print(f"{namespace}\t{pod}\t{pods[pod]}")
+        else:
+            print(json.dumps(pods, indent=4))
 
 
