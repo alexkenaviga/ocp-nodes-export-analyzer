@@ -78,7 +78,15 @@ def print_resources(output_data: dict, json_format: bool):
     default=False,
     help="Print nodes resources instead of pods"
 )
-def analyze(folder, include_openshift_ns, json_format, resources):
+@click.option(
+    "-w",
+    "--worker-nodes",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Print only worker nodes content"
+)
+def analyze(folder, include_openshift_ns, json_format, resources, worker_nodes):
     target_directory = Path(folder)
 
     if not  target_directory.is_dir():
@@ -96,27 +104,30 @@ def analyze(folder, include_openshift_ns, json_format, resources):
 
             parsed = parser.parse(export_path)
 
-            if resources:
-                output_data[parsed["Name"]["value"]] = parsed["Capacity"]["content"]
+            if not worker_nodes or "worker" in parsed["Name"]["value"]:
+
+                if resources:
+                    output_data[parsed["Name"]["value"]] = parsed["Capacity"]["content"]
+                else:
+                    non_terminated_pods = parsed["Non-terminated Pods"]["content"]
+                    for namespace in non_terminated_pods:
+                        # Include only non-openshift namespace unless flag `include_openshift_ns` requires them
+                        if include_openshift_ns or not namespace.startswith("openshift"):
+
+                            # print(f"    - {export_path} -> {namespace}")
+                            if namespace not in output_data:
+                                output_data[namespace] = {}
+
+                            for pod_name in non_terminated_pods[namespace]:
+                                if pod_name not in output_data[namespace]:
+                                    output_data[namespace][pod_name] = {"count": 1, "resources": []}
+                                else :
+                                    output_data[namespace][pod_name]["count"] += 1
+
+                                if non_terminated_pods[namespace][pod_name] not in output_data[namespace][pod_name]["resources"]:
+                                    output_data[namespace][pod_name]["resources"].append(non_terminated_pods[namespace][pod_name])
             else:
-                non_terminated_pods = parsed["Non-terminated Pods"]["content"]
-                for namespace in non_terminated_pods:
-                    # Include only non-openshift namespace unless flag `include_openshift_ns` requires them
-                    if include_openshift_ns or not namespace.startswith("openshift"):
-
-                        # print(f"    - {export_path} -> {namespace}")
-                        if namespace not in output_data:
-                            output_data[namespace] = {}
-
-                        for pod_name in non_terminated_pods[namespace]:
-                            if pod_name not in output_data[namespace]:
-                                output_data[namespace][pod_name] = {"count": 1, "resources": []}
-                            else :
-                                output_data[namespace][pod_name]["count"] += 1
-
-                            if non_terminated_pods[namespace][pod_name] not in output_data[namespace][pod_name]["resources"]:
-                                output_data[namespace][pod_name]["resources"].append(non_terminated_pods[namespace][pod_name])
-
+                pass
         if resources:
             print_resources(output_data, json_format)
         else:
