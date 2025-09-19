@@ -1,3 +1,5 @@
+import sys
+
 import click
 import json
 
@@ -7,6 +9,8 @@ from analyzer import Parser
 
 ANALYSIS_HEADER = ["NAMESPACE","DEPLOYMENT","INSTANCES","CPU REQUESTS[m]","CPU LIMITS[m]",
                    "MEMORY REQUESTS","MEMORY LIMITS","MULTIPLE RESOURCES"]
+
+ANALYSIS_RES_HEADER = ["NODE","CPU","MEMORY"]
 
 
 def common_options(f):
@@ -37,6 +41,25 @@ def cli():
     """Main entry point for the CLI."""
 
 
+def print_pods(output_data: dict, json_format: bool):
+    if not json_format:
+        print('\t'.join(ANALYSIS_HEADER))
+        for namespace, output_data in output_data.items():
+            for pod in output_data:
+                resources = [str(value) for value in output_data[pod]["resources"][0].values()]
+                print(
+                    f"{namespace}\t{pod}\t{output_data[pod]["count"]}\t{'\t'.join(resources)}\t{len(output_data[pod]["resources"]) > 1}")
+    else:
+        print(json.dumps(output_data, indent=4))
+
+def print_resources(output_data: dict, json_format: bool):
+    if not json_format:
+        print('\t'.join(ANALYSIS_RES_HEADER))
+        for node, res in output_data.items():
+            print(f"{node}\t{res['cpu']}\t{res['memory']}")
+    else:
+        print(json.dumps(output_data, indent=4))
+
 @cli.command(name="analyze", help="Get a list of datasources")
 @common_options
 @click.option(
@@ -47,7 +70,15 @@ def cli():
     default=False,
     help="Use JSON format, default is TSV"
 )
-def analyze(folder, include_openshift_ns, json_format):
+@click.option(
+    "-r",
+    "--resources",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Print nodes resources instead of pods"
+)
+def analyze(folder, include_openshift_ns, json_format, resources):
     target_directory = Path(folder)
 
     if not  target_directory.is_dir():
@@ -65,31 +96,31 @@ def analyze(folder, include_openshift_ns, json_format):
 
             parsed = parser.parse(export_path)
 
-            non_terminated_pods = parsed["Non-terminated Pods"]["content"]
-            for namespace in non_terminated_pods:
-                # Include only non-openshift namespace unless flag `include_openshift_ns` requires them
-                if include_openshift_ns or not namespace.startswith("openshift"):
+            if resources:
+                output_data[parsed["Name"]["value"]] = parsed["Capacity"]["content"]
+            else:
+                non_terminated_pods = parsed["Non-terminated Pods"]["content"]
+                for namespace in non_terminated_pods:
+                    # Include only non-openshift namespace unless flag `include_openshift_ns` requires them
+                    if include_openshift_ns or not namespace.startswith("openshift"):
 
-                    # print(f"    - {export_path} -> {namespace}")
-                    if namespace not in output_data:
-                        output_data[namespace] = {}
+                        # print(f"    - {export_path} -> {namespace}")
+                        if namespace not in output_data:
+                            output_data[namespace] = {}
 
-                    for pod_name in non_terminated_pods[namespace]:
-                        if pod_name not in output_data[namespace]:
-                            output_data[namespace][pod_name] = {"count": 1, "resources": []}
-                        else :
-                            output_data[namespace][pod_name]["count"] += 1
+                        for pod_name in non_terminated_pods[namespace]:
+                            if pod_name not in output_data[namespace]:
+                                output_data[namespace][pod_name] = {"count": 1, "resources": []}
+                            else :
+                                output_data[namespace][pod_name]["count"] += 1
 
-                        if non_terminated_pods[namespace][pod_name] not in output_data[namespace][pod_name]["resources"]:
-                            output_data[namespace][pod_name]["resources"].append(non_terminated_pods[namespace][pod_name])
+                            if non_terminated_pods[namespace][pod_name] not in output_data[namespace][pod_name]["resources"]:
+                                output_data[namespace][pod_name]["resources"].append(non_terminated_pods[namespace][pod_name])
 
-        if not json_format:
-            print('\t'.join(ANALYSIS_HEADER))
-            for namespace, output_data in output_data.items():
-                for pod in output_data:
-                    resources = [str(value) for value in output_data[pod]["resources"][0].values()]
-                    print(f"{namespace}\t{pod}\t{output_data[pod]["count"]}\t{'\t'.join(resources)}\t{len(output_data[pod]["resources"])>1}")
+        if resources:
+            print_resources(output_data, json_format)
         else:
-            print(json.dumps(output_data, indent=4))
+            print_pods(output_data, json_format)
+
 
 
